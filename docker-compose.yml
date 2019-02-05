@@ -2,4 +2,28 @@ version: "3"
 
 services:
     db:
-       image: "mysql"
+        image: "mariadb:10.2.12"
+        environment:
+            MYSQL_HOST: "localhost"
+            MYSQL_ROOT_PASSWORD: "my-secret-pw"
+            MYSQL_USER: "admin"
+            MYSQL_PASSWORD: "admin2019"
+            MYSQL_DATABASE: "jwt"
+            MYSQL_ROOT_HOST: "%"
+        expose:
+            - 3306
+
+    backend:
+        image: "jwt"
+        command: >
+            bash -c '
+                sleep 7; \
+                python manage.py makemigrations app && \
+                python manage.py migrate && \
+                python manage.py runserver 0.0.0.0:8000'
+        ports:
+            - 8000:8000
+        volumes:
+            - "./:/root"
+        depends_on:
+            - "db"
